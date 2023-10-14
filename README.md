@@ -17,23 +17,23 @@ https://soundcloud.com/gregory-billings/intro?si=2da3c878b2dd4d00b973a2563d18657
 
 The project utilizes [FakeYou.com](https://fakeyou.com/) to create deep fakes of different characters for playback during the call. These audio files are served out of an S3 bucket. To add your own audio files, name them in the following pattern:
 
-- S3 Bucket
--- character_name
---- intro.wav - Intro sound like in the above audio.
---- lights.wav - Message when change light request is made.
---- song-input.wav - Message to prompt to enter a song name and artist.
---- select-song.wav - Message prompting the user to press the number to match a song.
---- different-song.wav - Message when a song isn't found to prompt to search again.
---- after-beep.wav - Prompt for user to record a message.
---- save-or-record.wav - Prompt for the user to accept or re-record their message.
---- recording-saved.wav - Message that the recording has been saved.
---- joke1.wav - A joke to tell the caller.
---- sorry.wav - A generic error message apologizing for the problem.
+S3 Bucket
+  character_name
+    intro.wav - Intro sound like in the above audio.
+    lights.wav - Message when change light request is made.
+    song-input.wav - Message to prompt to enter a song name and artist.
+    select-song.wav - Message prompting the user to press the number to match a song.
+    different-song.wav - Message when a song isn't found to prompt to search again.
+    after-beep.wav - Prompt for user to record a message.
+    save-or-record.wav - Prompt for the user to accept or re-record their message.
+    recording-saved.wav - Message that the recording has been saved.
+    joke1.wav - A joke to tell the caller.
+    sorry.wav - A generic error message apologizing for the problem.
 
 There will also need to be a general file with a beep sound for prompts:
-- S3 Bucket
--- general
---- beep.wav - Some beep noise for speech recordings.
+S3 Bucket
+  general
+    beep.wav - Some beep noise for speech recordings.
 
 The bucket name is defined in the Environment Variable `AWS__BucketName`. The character_name is defined in the `Characters` Environment Variable as a comma separated list. For example: `"Characters": "arnold, barbie, bill-clinton, billy-mays, donald-trump, eminem, eric-cartman, hank-hill, hillary-clinton, morgan-freeman, quagmire, spongebob, stewie"`.
 
