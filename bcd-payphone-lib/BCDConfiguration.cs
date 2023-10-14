@@ -1,9 +1,25 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Reflection;
 using BCD.Payphone.Lib.Exceptions;
 using Microsoft.Extensions.Configuration;
 
 namespace BCD.Payphone.Lib
 {
+
+    public abstract class ConfigurationSection
+    {
+        public void Validate()
+        {
+            var validationContext = new ValidationContext(this);
+            var validationResults = new List<ValidationResult>();
+
+            if (!Validator.TryValidateObject(this, validationContext, validationResults, true))
+            {
+                throw new ConfigurationValidationException(validationResults);
+            }
+        }
+    }
+
     public class BCDConfiguration
     {
         public BCDConfiguration()
@@ -15,6 +31,40 @@ namespace BCD.Payphone.Lib
             Hubitat = new HubitatConfiguration();
             Characters = new List<string>();
             SurpriseNumbers = new List<string>();
+        }
+
+        public void Validate()
+        {
+            var validationContext = new ValidationContext(this);
+            var validationResults = new List<ValidationResult>();
+
+            // Validate this object
+            if (!Validator.TryValidateObject(this, validationContext, validationResults, true))
+            {
+                throw new ConfigurationValidationException(validationResults);
+            }
+
+            // Find all sub objects that extend the ConfigurationSection and validate them as well
+            Type myType = this.GetType();
+            PropertyInfo[] properties = myType.GetProperties();
+
+            foreach (PropertyInfo property in properties)
+            {
+                if (typeof(ConfigurationSection).IsAssignableFrom(property.PropertyType))
+                {
+                    if (property != null)
+                    {
+                        object propertyValue = property.GetValue(this);
+
+                        var prop = propertyValue as ConfigurationSection;
+
+                        if (prop != null)
+                        {
+                            (prop as ConfigurationSection).Validate();
+                        }
+                    }
+                }
+            }
         }
 
         public void BindConfigToObject(ConfigurationManager conf)
@@ -39,16 +89,16 @@ namespace BCD.Payphone.Lib
         }
 
         [Required]
-        public DatabaseConfiguration? Database { get; set; }
+        public DatabaseConfiguration Database { get; set; }
 
         [Required]
-        public TwilioConfiguration? Twilio { get; set; }
+        public TwilioConfiguration Twilio { get; set; }
 
         [Required]
-        public SpotifyConfiguration? Spotify { get; set; }
+        public SpotifyConfiguration Spotify { get; set; }
 
         [Required]
-        public AwsConfiguration? AWS { get; set; }
+        public AwsConfiguration AWS { get; set; }
 
         [Required]
         public HubitatConfiguration Hubitat { get; set; }
@@ -59,97 +109,127 @@ namespace BCD.Payphone.Lib
         public Guid GlobalSettingsGuid { get; set; }
 
         [Required]
-        public List<string>? Characters { get; set; }
+        public List<string> Characters { get; set; }
 
         [Required]
-        public List<string>? SurpriseNumbers { get; set; }
+        public List<string> SurpriseNumbers { get; set; }
+    }
 
-        public void Validate()
+    public class HubitatConfiguration : ConfigurationSection
+    {
+        [Required(AllowEmptyStrings = false)]
+
+        public string Host { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        public List<string> DeviceIds { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        public string AuthToken { get; set; }
+
+        public HubitatConfiguration()
         {
-            var validationContext = new ValidationContext(this);
-            var validationResults = new List<ValidationResult>();
+            Host = "";
+            DeviceIds = new List<string>();
+            AuthToken = "";
+        }
 
-            if (!Validator.TryValidateObject(this, validationContext, validationResults, true))
-            {
-                throw new ConfigurationValidationException(validationResults);
-            }
+    }
+
+    public class SpotifyConfiguration : ConfigurationSection
+    {
+        [Required(AllowEmptyStrings = false)]
+        public string ClientId { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        public string ClientSecret { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        public string RedirectUrl { get; set; }
+
+        [Required(AllowEmptyStrings = false)]
+        public string RefreshToken { get; set; }
+
+        public SpotifyConfiguration()
+        {
+            ClientId = "";
+            ClientSecret = "";
+            RedirectUrl = "";
+            RefreshToken = "";
         }
     }
 
-    public class HubitatConfiguration
+    public class TwilioConfiguration : ConfigurationSection
     {
-        [Required]
-        public string? Host { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string AuthToken { get; set; }
 
-        [Required]
-        public List<string>? DeviceIds { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string AccountSid { get; set; }
 
-        [Required]
-        public string? AuthToken { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string AccessCode { get; set; }
 
+        public TwilioConfiguration()
+        {
+            AuthToken = "";
+            AccountSid = "";
+            AccessCode = "";
+        }
     }
 
-    public class SpotifyConfiguration
-    {
-        [Required]
-        public string? ClientId { get; set; }
-
-        [Required]
-        public string? ClientSecret { get; set; }
-
-        [Required]
-        public string? RedirectUrl { get; set; }
-
-        [Required]
-        public string? RefreshToken { get; set; }
-    }
-
-    public class TwilioConfiguration
-    {
-        [Required]
-        public string? AuthToken { get; set; }
-
-        [Required]
-        public string? AccountSid { get; set; }
-
-        [Required]
-        public string? AccessCode { get; set; }
-    }
-
-    public class DatabaseConfiguration
+    public class DatabaseConfiguration : ConfigurationSection
     {
         [Required]
         public DatabaseType DatabaseType { get; set; }
 
-        [Required]
-        public string? Server { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Server { get; set; }
 
         [Required]
         public int Port { get; set; }
 
-        [Required]
-        public string? Database { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Database { get; set; }
 
-        [Required]
-        public string? Username { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Username { get; set; }
 
-        [Required]
-        public string? Password { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Password { get; set; }
+
+        public DatabaseConfiguration()
+        {
+            DatabaseType = DatabaseType.Mongo;
+            Server = "";
+            Port = 27017;
+            Database = "";
+            Username = "";
+            Password = "";
+        }
     }
 
-    public class AwsConfiguration
+    public class AwsConfiguration : ConfigurationSection
     {
-        [Required]
-        public string? AccessKey { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string AccessKey { get; set; }
 
-        [Required]
-        public string? SecretKey { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string SecretKey { get; set; }
 
-        [Required]
-        public string? BucketName { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string BucketName { get; set; }
 
-        [Required]
-        public string? Region { get; set; }
+        [Required(AllowEmptyStrings = false)]
+        public string Region { get; set; }
+
+        public AwsConfiguration()
+        {
+            AccessKey = "";
+            SecretKey = "";
+            BucketName = "";
+            Region = "";
+        }
     }
 
     public enum DatabaseType

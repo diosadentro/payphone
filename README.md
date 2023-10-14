@@ -76,3 +76,7 @@ The following environment variables are required for functionality:
 The project utilizes Helm for deployment. See the `infrastructure/helm directory for details`. Make sure to update `<docker repo>` and `<cloudflare hostname>` in the values.yaml file. By default, the helm chart will create 3 replicas.
 
 This project utilizes [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) to expose the service to the internet from a kubernetes pod.
+
+## Docker Image
+
+A pre-built docker image is available for your user on [Docker hub](https://hub.docker.com/r/diosadentro/party-payphone)

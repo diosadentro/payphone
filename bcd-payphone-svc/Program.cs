@@ -6,10 +6,13 @@ using BCD.Payphone.Logic;
 using BCD.Payphone.Svc;
 using Hangfire;
 using Hangfire.MemoryStorage;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Formatting.Compact;
+using ILogger = Serilog.ILogger;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +69,11 @@ builder.Services.AddSwaggerGen(options =>
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
 });
+
+using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
+    .SetMinimumLevel(LogLevel.Trace)
+    .AddSerilog()
+    .AddConsole());
 
 var app = builder.Build();
 
@@ -135,6 +143,14 @@ app.UseSerilogRequestLogging(opts =>
 
 app.MapControllers();
 
-app.Run();
+app.Start();
 
+var server = app.Services.GetService<IServer>();
+var addressFeature = server.Features.Get<IServerAddressesFeature>();
 
+foreach (var address in addressFeature.Addresses)
+{
+    Log.Information("Server Started. Listening on {address}", address);
+}
+
+app.WaitForShutdown();
