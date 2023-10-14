@@ -11,10 +11,7 @@ The Party Payphone project aims to make an interactive phone number that can be 
 
 The system also provides an admin mode by pressing "*" which allows for the entry of an access code to enable dial out. This helps to bypass the autodialer hooked up to my payphone.
 
-<figure class="video_container">
-  <iframe src="intro.mov" frameborder="0" allowfullscreen="true">
-</iframe>
-</figure>
+![](intro.mov)
 
 ## Voice creation
 
