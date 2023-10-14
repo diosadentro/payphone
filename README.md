@@ -7,11 +7,11 @@ The Party Payphone project aims to make an interactive phone number that can be 
 3. Tell a joke
 4. Record a message for a future caller
 5. Redirect the caller to a number of different prank call numbers (such as the rejection hotline or rick-roll number)
-6. Repeat the number
+6. Repeat the instructions
 
 The system also provides an admin mode by pressing "*" which allows for the entry of an access code to enable dial out. This helps to bypass the autodialer hooked up to my payphone.
 
-https://github.com/diosadentro/payphone/assets/3356337/e1cee0a8-4347-43e0-b6fa-d511feca5d6a
+https://soundcloud.com/gregory-billings/intro?si=2da3c878b2dd4d00b973a2563d186571&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing
 
 ## Voice creation
 
@@ -19,21 +19,21 @@ The project utilizes [FakeYou.com](https://fakeyou.com/) to create deep fakes of
 
 - S3 Bucket
 -- character_name
---- intro.wav - Intro sound like in the above audio
---- lights.wav - Message when change lights request is made
---- song-input.wav - Message to prompt to enter a song name and artist
---- select-song.wav - Message prompting the user to press the number to match a song
---- different-song.wav - Message when a song isn't found to prompt to search to search again
---- after-beep.wav - Prompt for user to record a message
---- save-or-record.wav - Prompt for the user to accept or re-record their message
---- recording-saved.wav - Message that the recording has been saved
---- joke1.wav - A joke to tell the caller
+--- intro.wav - Intro sound like in the above audio.
+--- lights.wav - Message when change light request is made.
+--- song-input.wav - Message to prompt to enter a song name and artist.
+--- select-song.wav - Message prompting the user to press the number to match a song.
+--- different-song.wav - Message when a song isn't found to prompt to search again.
+--- after-beep.wav - Prompt for user to record a message.
+--- save-or-record.wav - Prompt for the user to accept or re-record their message.
+--- recording-saved.wav - Message that the recording has been saved.
+--- joke1.wav - A joke to tell the caller.
 --- sorry.wav - A generic error message apologizing for the problem.
 
 There will also need to be a general file with a beep sound for prompts:
 - S3 Bucket
 -- general
---- beep.wav - Some beep noise for song selection.
+--- beep.wav - Some beep noise for speech recordings.
 
 The bucket name is defined in the Environment Variable `AWS__BucketName`. The character_name is defined in the `Characters` Environment Variable as a comma separated list. For example: `"Characters": "arnold, barbie, bill-clinton, billy-mays, donald-trump, eminem, eric-cartman, hank-hill, hillary-clinton, morgan-freeman, quagmire, spongebob, stewie"`.
 
@@ -70,7 +70,7 @@ The following environment variables are required for functionality:
 
 ## Deployment
 
-The project utilizes Helm for deployment. See the `infrastructure/helm directory for details`. Make sure to update `<docker repo>` and `<cloudflare hostname>` in the values.yaml file. By default, the helm chart will create 3 replicas.
+The project utilizes Helm for deployment. See the `infrastructure/helm` directory for details. Make sure to update `<docker repo>` and `<cloudflare hostname>` in the values.yaml file. By default, the helm chart will create 3 replicas.
 
 This project utilizes [Cloudflare Tunnel](https://www.cloudflare.com/products/tunnel/) to expose the service to the internet from a kubernetes pod.
 
